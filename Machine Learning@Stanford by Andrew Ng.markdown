@@ -385,7 +385,7 @@ $$Cost(h_\theta(x),y) =  \begin{equation}
   \end{equation} $$
 注意到我们的Cost function是分两种情况的，我们想将这两个方程压缩成一个方程，方便编程实现和Gradient descent。
 $$Cost(h_\theta(x),y) = -ylog(h_\theta(x)) - (1-y)log(1-h_\theta(x))$$
-$$J(\theta) = -\frac 1 m [\sum_{i=1}^m y_i log(h_\theta(x_i)) + (1-y_i)log(1-h_\theta(x_i)) ]$$
+$$J(\theta) = -\frac 1 m \left[\sum_{i=1}^m y_i log(h_\theta(x_i)) + (1-y_i)log(1-h_\theta(x_i)) \right]$$
 为了得到合适的$\theta$：$min_\theta J(\theta)$
 对于给定的样本$x$：输出$h_\theta = \frac 1 {1 + e^{-\theta^Tx}}$
 为了得到$min_\theta J(\theta)$：Gradient descent
@@ -395,7 +395,7 @@ $\theta_j := \theta_j - \alpha \frac d {d\theta_j} J(\theta)$
 对于每个$\theta_j$都要同时更新。
 }
 带入$J(\theta)$求偏微分，我们会发现得到的等式跟我们以前的Linear regression是一样的
-$$\theta_j := \theta_j - \alpha \sum_{i=1}^m(h_\theta(x_i) - y_i)x_i^j$$
+$$\theta_j := \theta_j - \alpha \frac 1  m\sum_{i=1}^m(h_\theta(x_i) - y_i)x_i^j$$
 只是$h_\theta(x)$的定义不一样了。
 
 ###高级优化
@@ -456,8 +456,24 @@ exitFlag =  1
 
  - 对于参数theta给予较小的权值，使得我们的假设函数得以简化，降低overfit的可能性。
  - 以前面预测房价的那个为例。假设我们有100个feature，我们不知道哪个feature会有较高的幂，因此我想修改cost function
-$$J(\theta) = \frac 1 {2m} \sum_{i=1}^m[(h_\theta(x_i) - y_i)^2 + \lambda \sum_{i=1}^m \theta_i^2]$$
+$$J(\theta) = \frac 1 {2m} \left[ \sum_{i=1}^m(h_\theta(x_i) - y_i)^2 + \lambda \sum_{j=1}^m \theta_j^2 \right]$$
 后面新出现的部分称之为Regularization，参数$\lambda$称为Regularization参数，它的作用是用来平衡前后两个部分，使得前半部分能够适应training set，后半部分能够让我们得到较小的theta参数，最终能让我们的假设函数简化以防止overfitting。
 ![underfitting](http://g.hiphotos.bdimg.com/album/s%3D550%3Bq%3D90%3Bc%3Dxiangce%2C100%2C100/sign=166a081867380cd7e21ea2e8917fdc09/cb8065380cd7912331c963dcaf345982b2b78069.jpg?referer=3b023f62ad51f3de9aa58c54e027&x=.jpg)
 
 ### Regularized Linear Regression
+$$J(\theta) = \frac 1 {2m} \left[ \sum_{i=1}^m(h_\theta(x_i) - y_i)^2 + \lambda \sum_{j=1}^m \theta_j^2 \right]$$ 
+以前我们使用Gradient descent来求theta，现在我们将新的$J(\theta)$带入进去,得到
+$$\theta_0 := \theta_0 - \alpha \frac 1 m\sum_{i=1}^m(h_\theta(x_i) - y_i)x_i^0$$
+$$\theta_j := \theta_j - \alpha \frac 1 m \sum_{i=1}^m(h_\theta(x_i) - y_i)x_i^j + \frac \lambda m \theta_j \\
+ := \theta_j(1-\alpha \frac \lambda m) - \alpha \frac 1 m \sum_{i=1}^m(h_\theta(x_i) - y_i)x_i^j $$
+
+可以看出后面的部分跟gradient descent是一样的，只是在$\theta_j$部分多了一个$1-\alpha \frac \lambda m$，它是恒小于1的。
+
+**Normal equation**
+增加了Regularization的Normal equation，得到的矩阵不会出现non-invertibility问题
+![NormalEquation](http://b.hiphotos.bdimg.com/album/s%3D550%3Bq%3D90%3Bc%3Dxiangce%2C100%2C100/sign=c7c5fbe2d8b44aed5d4ebee18327f63c/377adab44aed2e73ca097e848501a18b86d6fab2.jpg?referer=7cb09863b0fb431643084e4a4650&x=.jpg)
+
+### Regularized Logistic Regression
+Logistic Regression会出现overfitting的问题。已知cost function：
+$$J(\theta) = -\frac 1 m \left[\sum_{i=1}^m y_i log(h_\theta(x_i)) + (1-y_i)log(1-h_\theta(x_i)) \right]$$
+我们需要引入Regularization来解决这个问题。得到的gradient descent公式与linear regression的公式相同，只是假设函数的定义不一样。
